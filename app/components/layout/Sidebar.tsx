@@ -1,4 +1,3 @@
-// app/components/layout/Sidebar.tsx
 'use client';
 
 import { useState } from 'react';
@@ -17,7 +16,7 @@ export function Sidebar() {
     }
 
     return (
-        <div className="w-80 bg-gray-900 border-r border-gray-800 h-full overflow-y-auto">
+        <div className="w-80 bg-gray-900 border-r border-gray-800 flex flex-col overflow-hidden">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
                 <TabsList className="grid grid-cols-5 border-b border-gray-800 rounded-none">
                     <TabsTrigger value="text" className="text-xs py-3">

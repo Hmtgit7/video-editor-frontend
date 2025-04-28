@@ -25,11 +25,11 @@ export function AudioTrack() {
 
     return (
         <div className="h-16 flex items-center border-b border-gray-800 relative">
-            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gray-800 border-r border-gray-700 flex items-center px-2 z-10">
+            <div className="sticky left-0 top-0 bottom-0 w-24 bg-gray-800 border-r border-gray-700 flex items-center px-2 z-10">
                 <span className="text-xs truncate">Audio</span>
             </div>
 
-            <div className="flex items-center ml-24 h-full">
+            <div className="flex items-center ml-24 h-full w-full">
                 {mockSegments.map(segment => {
                     const segmentWidth = ((segment.endTime - segment.startTime) / (duration * zoom)) * 100;
                     const segmentLeft = (segment.startTime / (duration * zoom)) * 100;

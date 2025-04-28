@@ -1,4 +1,3 @@
-// app/components/timeline/Timeline.tsx
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
@@ -56,7 +55,7 @@ export function Timeline() {
 
     return (
         <div className="h-full flex flex-col bg-gray-900 text-white">
-            <div className="flex justify-between items-center px-4 h-10 border-b border-gray-800">
+            <div className="flex justify-between items-center px-4 h-10 border-b border-gray-800 sticky top-0 z-10 bg-gray-900">
                 <div className="text-sm">{formatTime(currentTime)} / {formatTime(duration)}</div>
 
                 <div className="flex items-center gap-2">
@@ -91,9 +90,9 @@ export function Timeline() {
                 </div>
             </div>
 
-            <div className="flex-grow relative overflow-hidden">
+            <div className="flex-grow relative overflow-auto">
                 {/* Time markers */}
-                <div className="h-6 border-b border-gray-800 bg-gray-850 flex text-xs">
+                <div className="h-6 border-b border-gray-800 bg-gray-850 flex text-xs sticky top-10 z-10">
                     {Array.from({ length: Math.ceil(duration * zoom / 10) + 1 }).map((_, i) => (
                         <div key={i} className="flex-shrink-0 w-24 border-r border-gray-700 flex items-center pl-1">
                             {formatTime(i * 10)}
@@ -104,8 +103,13 @@ export function Timeline() {
                 {/* Timeline tracks container */}
                 <div
                     ref={timelineRef}
-                    className="relative h-full overflow-x-auto overflow-y-hidden"
+                    className="relative overflow-x-auto overflow-y-auto"
                     onClick={handleTimelineClick}
+                    style={{
+                        // Make sure the timeline expands based on zoom level and duration
+                        minWidth: "100%",
+                        width: `${Math.max(100, duration * zoom * 10)}px`
+                    }}
                 >
                     {/* Playhead indicator */}
                     <div
@@ -113,8 +117,8 @@ export function Timeline() {
                         style={{ left: `${playheadPosition}%` }}
                     />
 
-                    {/* Tracks */}
-                    <div className="flex flex-col h-full">
+                    {/* Tracks - Set fixed minimum height to ensure they're visible */}
+                    <div className="flex flex-col min-h-[150px]">
                         <VideoTrack />
                         <AudioTrack />
                         <SubtitleTrack />
