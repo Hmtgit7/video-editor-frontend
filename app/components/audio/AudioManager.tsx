@@ -4,14 +4,11 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAppDispatch } from '../../store/hooks';
 
 export function AudioManager() {
-    const dispatch = useAppDispatch();
     const [activeTab, setActiveTab] = useState('original');
     const [volume, setVolume] = useState(100);
     const [musicUrl, setMusicUrl] = useState<string | null>(null);

@@ -37,7 +37,6 @@ export function Waveform({
                 barWidth: 2,
                 barGap: 1,
                 barRadius: 2,
-                responsive: true,
             });
 
             wavesurfer.current.load(audioUrl);

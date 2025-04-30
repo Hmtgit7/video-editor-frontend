@@ -4,7 +4,7 @@ import projectReducer from './slices/projectSlice';
 import timelineReducer from './slices/timelineSlice';
 import videoReducer from './slices/videoSlice';
 import audioReducer from './slices/audioSlice';
-import subtitleReducer from './slices/subtitleSlice.tsx';
+import subtitleReducer from './slices/subtitleSlice';
 import exportReducer from './slices/exportSlice';
 
 export const store = configureStore({

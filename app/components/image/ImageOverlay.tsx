@@ -1,9 +1,10 @@
 // app/components/image/ImageOverlay.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
-import Draggable from 'react-draggable';
-import { Resizable } from 're-resizable';
+import { useState } from 'react';
+// First, add the proper type definitions for react-draggable and re-resizable
+import Draggable, { DraggableData } from 'react-draggable';
+import { Resizable, ResizeCallbackData } from 're-resizable';
 import { useAppSelector } from '../../store/hooks';
 
 interface ImageOverlayProps {
@@ -39,13 +40,18 @@ export function ImageOverlay({ id, url, position, size, style }: ImageOverlayPro
     return (
         <Draggable
             position={pos}
-            onStop={(e, data) => {
+            onStop={(e: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent, data: DraggableData) => {
                 setPos({ x: data.x, y: data.y });
             }}
         >
             <Resizable
                 size={dimensions}
-                onResizeStop={(e, direction, ref, d) => {
+                onResizeStop={(
+                    e: MouseEvent | TouchEvent,
+                    direction: string,
+                    ref: HTMLElement,
+                    d: ResizeCallbackData
+                ) => {
                     setDimensions({
                         width: dimensions.width + d.width,
                         height: dimensions.height + d.height,
