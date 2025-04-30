@@ -72,17 +72,17 @@ export function Timeline() {
                 </div>
 
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" className="h-6 w-6">
+                    <Button variant="outline" size="icon" className="h-6 w-6 text-white border-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                             <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                         </svg>
                     </Button>
-                    <Button variant="outline" size="icon" className="h-6 w-6">
+                    <Button variant="outline" size="icon" className="h-6 w-6 text-white border-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                             <path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z" />
                         </svg>
                     </Button>
-                    <Button variant="outline" size="icon" className="h-6 w-6">
+                    <Button variant="outline" size="icon" className="h-6 w-6 text-white border-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                             <path d="M13.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 0015.25 3h-1.5z" />
                             <path d="M3.75 13.75a.75.75 0 01.75-.75h5a.75.75 0 010 1.5h-5a.75.75 0 01-.75-.75zM3.75 10a.75.75 0 01.75-.75h6.5a.75.75 0 010 1.5h-6.5a.75.75 0 01-.75-.75zM3.75 6.25a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5h-4.5a.75.75 0 01-.75-.75z" />
@@ -91,9 +91,9 @@ export function Timeline() {
                 </div>
             </div>
 
-            <div className="flex-grow relative overflow-hidden">
+            <div className="flex-grow relative overflow-auto">
                 {/* Time markers */}
-                <div className="h-6 border-b border-gray-800 bg-gray-850 flex text-xs">
+                <div className="h-6 border-b border-gray-800 bg-gray-850 flex text-xs sticky top-0 z-10">
                     {Array.from({ length: Math.ceil(duration * zoom / 10) + 1 }).map((_, i) => (
                         <div key={i} className="flex-shrink-0 w-24 border-r border-gray-700 flex items-center pl-1">
                             {formatTime(i * 10)}
@@ -104,8 +104,9 @@ export function Timeline() {
                 {/* Timeline tracks container */}
                 <div
                     ref={timelineRef}
-                    className="relative h-full overflow-x-auto overflow-y-hidden"
+                    className="relative overflow-x-auto"
                     onClick={handleTimelineClick}
+                    style={{ minWidth: `${Math.ceil(duration * zoom / 10) * 24 * 10}px` }}
                 >
                     {/* Playhead indicator */}
                     <div
@@ -114,7 +115,7 @@ export function Timeline() {
                     />
 
                     {/* Tracks */}
-                    <div className="flex flex-col h-full">
+                    <div className="flex flex-col">
                         <VideoTrack />
                         <AudioTrack />
                         <SubtitleTrack />
