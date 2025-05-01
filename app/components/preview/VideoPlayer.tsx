@@ -1,29 +1,30 @@
-// app/components/preview/VideoPlayer.tsx
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef, useCallback } from 'react';
 import ReactPlayer from 'react-player';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { setCurrentTime } from '../../store/slices/timelineSlice';
+import { usePreviewSync } from '../../hooks/usePreviewSync';
+import { TextOverlay } from '../text/TextOverlay';
+import { ImageOverlay } from '../image/ImageOverlay';
 
 export function VideoPlayer() {
     const dispatch = useAppDispatch();
     const videoUrl = useAppSelector(state => state.video.videoUrl);
-    const currentTime = useAppSelector(state => state.timeline.currentTime);
     const playerRef = useRef<ReactPlayer>(null);
 
-    // Sync player time with timeline time
-    useEffect(() => {
-        if (playerRef.current) {
-            const player = playerRef.current;
-            const currentPlayerTime = player.getCurrentTime();
+    // Get synchronized preview data
+    const { activeSubtitles, activeVolume } = usePreviewSync(playerRef);
 
-            // Only seek if the difference is significant to avoid endless loops
-            if (Math.abs(currentPlayerTime - currentTime) > 0.5) {
-                player.seekTo(currentTime, 'seconds');
-            }
-        }
-    }, [currentTime]);
+    // Get overlays for the current time
+    const imageOverlays = useAppSelector(state => state.image?.overlays || []);
+    const textOverlays = useAppSelector(state => state.text?.overlays || []);
+    const currentTime = useAppSelector(state => state.timeline.currentTime);
+
+    // Handle progress updates from the player
+    const handleProgress = useCallback((state) => {
+        dispatch(setCurrentTime(state.playedSeconds));
+    }, [dispatch]);
 
     if (!videoUrl) return null;
 
@@ -35,10 +36,9 @@ export function VideoPlayer() {
                 width="100%"
                 height="100%"
                 playing
+                volume={activeVolume}
                 controls
-                onProgress={(state) => {
-                    dispatch(setCurrentTime(state.playedSeconds));
-                }}
+                onProgress={handleProgress}
                 onDuration={(duration) => {
                     // If needed, update project duration
                 }}
@@ -51,9 +51,63 @@ export function VideoPlayer() {
                 }}
             />
 
-            {/* Overlay for subtitles and text if needed */}
-            <div className="absolute bottom-16 left-0 right-0 flex justify-center pointer-events-none">
-                {/* Subtitles would go here */}
+            {/* Overlay container for subtitles, text, and images */}
+            <div className="absolute inset-0 pointer-events-none">
+                {/* Active subtitles */}
+                {activeSubtitles.map(subtitle => (
+                    <div
+                        key={subtitle.id}
+                        className="absolute left-0 right-0 text-center px-4"
+                        style={{
+                            bottom: subtitle.position.y === 'bottom' ? '80px' : 'auto',
+                            top: subtitle.position.y === 'top' ? '20px' :
+                                subtitle.position.y === 'middle' ? '50%' : 'auto',
+                            transform: subtitle.position.y === 'middle' ? 'translateY(-50%)' : 'none',
+                            fontFamily: subtitle.style.fontFamily,
+                            fontSize: `${subtitle.style.fontSize}px`,
+                            color: subtitle.style.color,
+                            backgroundColor: subtitle.style.backgroundColor,
+                            fontWeight: subtitle.style.bold ? 'bold' : 'normal',
+                            fontStyle: subtitle.style.italic ? 'italic' : 'normal',
+                            textDecoration: subtitle.style.underline ? 'underline' : 'none',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            maxWidth: '80%',
+                            margin: '0 auto',
+                        }}
+                    >
+                        {subtitle.text}
+                    </div>
+                ))}
+
+                {/* Text overlays */}
+                {textOverlays.filter(overlay =>
+                    currentTime >= overlay.startTime &&
+                    currentTime <= overlay.endTime
+                ).map(overlay => (
+                    <TextOverlay
+                        key={overlay.id}
+                        id={overlay.id}
+                        text={overlay.text}
+                        style={overlay.style}
+                        position={overlay.position}
+                    />
+                ))}
+
+                {/* Image overlays */}
+                {imageOverlays.filter(overlay =>
+                    currentTime >= overlay.startTime &&
+                    currentTime <= overlay.endTime
+                ).map(overlay => (
+                    <ImageOverlay
+                        key={overlay.id}
+                        id={overlay.id}
+                        url={overlay.url}
+                        position={overlay.position}
+                        size={overlay.size}
+                        style={overlay.style}
+                    />
+                ))}
             </div>
         </div>
     );

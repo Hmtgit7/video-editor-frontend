@@ -1,15 +1,16 @@
-// app/store/slices/subtitleSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Subtitle } from '../../lib/types';
 
 interface SubtitleState {
     subtitles: Subtitle[];
     selectedSubtitleId: string | null;
+    previewSubtitle: Subtitle | null;
 }
 
 const initialState: SubtitleState = {
     subtitles: [],
     selectedSubtitleId: null,
+    previewSubtitle: null,
 };
 
 const subtitleSlice = createSlice({
@@ -34,6 +35,12 @@ const subtitleSlice = createSlice({
         setSelectedSubtitle: (state, action: PayloadAction<string | null>) => {
             state.selectedSubtitleId = action.payload;
         },
+        setPreviewSubtitle: (state, action: PayloadAction<Subtitle | null>) => {
+            state.previewSubtitle = action.payload;
+        },
+        clearPreviewSubtitle: (state) => {
+            state.previewSubtitle = null;
+        }
     },
 });
 
@@ -42,5 +49,7 @@ export const {
     removeSubtitle,
     updateSubtitle,
     setSelectedSubtitle,
+    setPreviewSubtitle,
+    clearPreviewSubtitle,
 } = subtitleSlice.actions;
 export default subtitleSlice.reducer;

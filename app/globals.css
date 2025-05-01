@@ -73,6 +73,59 @@ body {
   box-shadow: 0 0 0 2px white;
 }
 
+/* Enhanced timeline markers */
+.timeline-marker {
+  height: 14px;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.timeline-marker-hour {
+  height: 20px;
+  width: 2px;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.timeline-current-time {
+  height: 100%;
+  width: 2px;
+  background-color: #ff3d71;
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  box-shadow: 0 0 4px rgba(255, 61, 113, 0.6);
+}
+
+/* Draggable segment styles */
+.segment-dragging {
+  opacity: 0.5;
+  border: 2px dashed #4a9eff;
+}
+
+.segment-drop-target {
+  background-color: rgba(74, 158, 255, 0.2);
+}
+
+/* Make sure timeline elements have proper z-index */
+.timeline-track-container {
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-track-label {
+  position: relative;
+  z-index: 2;
+}
+
+/* Add visual cue for draggable items */
+.cursor-move {
+  cursor: grab;
+}
+
+.cursor-move:active {
+  cursor: grabbing;
+}
+
 /* Video player controls custom styles */
 .react-player__control-bar {
   background-color: rgba(0, 0, 0, 0.7) !important;
@@ -89,7 +142,7 @@ body {
   color: white !important;
 }
 
-/* Add these to your globals.css */
+/* Add these for better layout */
 html, body {
   height: 100%;
   overflow: hidden; /* Prevent body scrolling */
@@ -143,4 +196,31 @@ html, body {
   height: 200px; /* Fixed height */
   overflow-x: auto; /* Horizontal scrolling */
   flex-shrink: 0; /* Prevent shrinking */
+}
+
+/* Tab styling for better contrast */
+.tab-active {
+  @apply bg-blue-600 text-white;
+}
+
+/* Improved form controls */
+.input-dark {
+  @apply bg-gray-800 border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500;
+}
+
+.select-dark {
+  @apply bg-gray-800 border-gray-700;
+}
+
+/* Enhanced slider track and thumb styling */
+.slider-track {
+  @apply h-2 bg-gray-700 rounded-full overflow-hidden;
+}
+
+.slider-range {
+  @apply h-full bg-blue-500;
+}
+
+.slider-thumb {
+  @apply block h-5 w-5 rounded-full border-2 border-gray-200 bg-white transition-colors;
 }

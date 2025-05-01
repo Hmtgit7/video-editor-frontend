@@ -54,6 +54,19 @@ const videoSlice = createSlice({
                 };
             }
         },
+        // Add new reducer for reordering segments
+        reorderVideoSegments: (state, action: PayloadAction<{ fromIndex: number; toIndex: number }>) => {
+            const { fromIndex, toIndex } = action.payload;
+            if (
+                fromIndex >= 0 &&
+                fromIndex < state.selectedVideoSegments.length &&
+                toIndex >= 0 &&
+                toIndex < state.selectedVideoSegments.length
+            ) {
+                const [movedSegment] = state.selectedVideoSegments.splice(fromIndex, 1);
+                state.selectedVideoSegments.splice(toIndex, 0, movedSegment);
+            }
+        },
     },
 });
 
@@ -66,5 +79,6 @@ export const {
     addVideoSegment,
     removeVideoSegment,
     updateVideoSegment,
+    reorderVideoSegments,
 } = videoSlice.actions;
 export default videoSlice.reducer;

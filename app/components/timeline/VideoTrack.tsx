@@ -1,7 +1,7 @@
-// app/components/timeline/VideoTrack.tsx
 'use client';
 
 import { useAppSelector } from '../../store/hooks';
+import { DraggableSegment } from './DraggableSegment';
 
 export function VideoTrack() {
     const videoSegments = useAppSelector(state => state.video.selectedVideoSegments);
@@ -34,23 +34,22 @@ export function VideoTrack() {
                 <span className="text-xs truncate">Video</span>
             </div>
 
-            <div className="flex items-center ml-24 h-full">
-                {segments.map(segment => {
-                    const segmentWidth = ((segment.endTime - segment.startTime) / (duration * zoom)) * 100;
-                    const segmentLeft = (segment.startTime / (duration * zoom)) * 100;
+            <div className="flex items-center ml-24 h-full relative">
+                {segments.map((segment, index) => {
+                    const segmentWidth = `${((segment.endTime - segment.startTime) / (duration * zoom)) * 100}%`;
+                    const segmentLeft = `${(segment.startTime / (duration * zoom)) * 100}%`;
 
                     return (
-                        <div
+                        <DraggableSegment
                             key={segment.id}
-                            className="h-12 bg-blue-600 rounded relative cursor-pointer hover:bg-blue-500 flex items-center justify-center"
-                            style={{
-                                width: `${segmentWidth}%`,
-                                left: `${segmentLeft}%`,
-                                position: 'absolute'
-                            }}
+                            id={segment.id}
+                            index={index}
+                            segmentWidth={segmentWidth}
+                            segmentLeft={segmentLeft}
+                            className="bg-blue-600 hover:bg-blue-500"
                         >
                             <span className="text-xs truncate px-2">Segment {segment.id.split('-')[1]}</span>
-                        </div>
+                        </DraggableSegment>
                     );
                 })}
             </div>

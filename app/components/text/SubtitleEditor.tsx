@@ -1,7 +1,6 @@
-// app/components/text/SubtitleEditor.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +14,20 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { addSubtitle, setPreviewSubtitle, clearPreviewSubtitle } from '../../store/slices/subtitleSlice';
+import { setCurrentTime } from '../../store/slices/timelineSlice';
+import { v4 as uuidv4 } from 'uuid';
+
+// Helper function to convert time string to seconds
+const parseTimeToSeconds = (timeStr: string): number => {
+    const parts = timeStr.split(':').map(Number);
+    if (parts.length === 2) {
+        return parts[0] * 60 + parts[1]; // MM:SS format
+    } else if (parts.length === 3) {
+        return parts[0] * 3600 + parts[1] * 60 + parts[2]; // HH:MM:SS format
+    }
+    return 0;
+};
 
 export function SubtitleEditor() {
     const dispatch = useAppDispatch();
@@ -28,31 +41,109 @@ export function SubtitleEditor() {
     const [fontFamily, setFontFamily] = useState('Arial');
     const [activeTab, setActiveTab] = useState('subtitle');
 
-    const addSubtitle = () => {
-        // In a real implementation, this would dispatch an action to add the subtitle
-        console.log('Adding subtitle:', {
-            text: subtitleText,
-            startTime,
-            endTime,
-            style: {
-                fontSize,
-                fontColor,
-                backgroundColor,
-                position,
-                fontFamily,
-            },
-        });
+    // Clear preview when unmounting
+    useEffect(() => {
+        return () => {
+            dispatch(clearPreviewSubtitle());
+        };
+    }, [dispatch]);
 
-        // Reset the form
+    const addSubtitleHandler = () => {
+        if (!subtitleText.trim()) return;
+
+        const subtitle = {
+            id: uuidv4(),
+            text: subtitleText,
+            startTime: parseTimeToSeconds(startTime),
+            endTime: parseTimeToSeconds(endTime),
+            position: {
+                x: 50, // Center horizontally
+                y: position === 'top' ? 10 : position === 'middle' ? 50 : 90,
+            },
+            style: {
+                fontFamily,
+                fontSize,
+                color: fontColor,
+                backgroundColor: backgroundColor === '#000000' && fontColor === '#FFFFFF'
+                    ? 'rgba(0, 0, 0, 0.7)' // Semi-transparent black for white text
+                    : backgroundColor,
+                bold: false,
+                italic: false,
+                underline: false,
+            },
+        };
+
+        dispatch(addSubtitle(subtitle));
+
+        // Clear form or prepare for next entry
         setSubtitleText('');
+
+        // Optionally adjust start time for the next subtitle
+        const endSecs = parseTimeToSeconds(endTime);
+        const newStartSecs = endSecs;
+        const newStartMins = Math.floor(newStartSecs / 60);
+        const newStartRemainingSecs = newStartSecs % 60;
+        setStartTime(`${String(newStartMins).padStart(2, '0')}:${String(newStartRemainingSecs).padStart(2, '0')}`);
+
+        // And end time (add 5 seconds)
+        const newEndSecs = newStartSecs + 5;
+        const newEndMins = Math.floor(newEndSecs / 60);
+        const newEndRemainingSecs = newEndSecs % 60;
+        setEndTime(`${String(newEndMins).padStart(2, '0')}:${String(newEndRemainingSecs).padStart(2, '0')}`);
+    };
+
+    const previewSubtitle = () => {
+        if (!subtitleText.trim()) return;
+
+        const previewTime = parseTimeToSeconds(startTime);
+        dispatch(setCurrentTime(previewTime));
+
+        const subtitle = {
+            id: 'preview',
+            text: subtitleText,
+            startTime: parseTimeToSeconds(startTime),
+            endTime: parseTimeToSeconds(endTime),
+            position: {
+                x: 50, // Center horizontally
+                y: position === 'top' ? 10 : position === 'middle' ? 50 : 90,
+            },
+            style: {
+                fontFamily,
+                fontSize,
+                color: fontColor,
+                backgroundColor: backgroundColor === '#000000' && fontColor === '#FFFFFF'
+                    ? 'rgba(0, 0, 0, 0.7)' // Semi-transparent black for white text
+                    : backgroundColor,
+                bold: false,
+                italic: false,
+                underline: false,
+            },
+        };
+
+        dispatch(setPreviewSubtitle(subtitle));
+
+        // Clear preview after 3 seconds
+        setTimeout(() => {
+            dispatch(clearPreviewSubtitle());
+        }, 3000);
     };
 
     return (
         <div className="h-full">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
                 <TabsList className="grid grid-cols-2">
-                    <TabsTrigger value="subtitle">Subtitle</TabsTrigger>
-                    <TabsTrigger value="text">Text Overlay</TabsTrigger>
+                    <TabsTrigger
+                        value="subtitle"
+                        className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                    >
+                        Subtitle
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="text"
+                        className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                    >
+                        Text Overlay
+                    </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="subtitle" className="flex-grow overflow-y-auto">
@@ -171,12 +262,21 @@ export function SubtitleEditor() {
                             </div>
                         </div>
 
-                        <Button
-                            onClick={addSubtitle}
-                            className="w-full mt-4 bg-blue-600 hover:bg-blue-700"
-                        >
-                            Add Subtitle
-                        </Button>
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                            <Button
+                                onClick={previewSubtitle}
+                                className="bg-gray-700 hover:bg-gray-600"
+                            >
+                                Preview Subtitle
+                            </Button>
+
+                            <Button
+                                onClick={addSubtitleHandler}
+                                className="bg-blue-600 hover:bg-blue-700"
+                            >
+                                Add Subtitle
+                            </Button>
+                        </div>
                     </div>
                 </TabsContent>
 

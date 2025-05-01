@@ -1,8 +1,6 @@
-// app/components/text/TextOverlay.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
-import Draggable from 'react-draggable';
+import { useState } from 'react';
 import { useAppSelector } from '../../store/hooks';
 
 interface TextOverlayProps {
@@ -21,42 +19,40 @@ interface TextOverlayProps {
         x: number;
         y: number;
     };
+    isEditing?: boolean;
 }
 
-export function TextOverlay({ id, text, style, position }: TextOverlayProps) {
+export function TextOverlay({ id, text, style, position, isEditing = false }: TextOverlayProps) {
     const [pos, setPos] = useState(position);
     const currentTime = useAppSelector(state => state.timeline.currentTime);
 
-    // This would be used in a real implementation to only show the overlay
-    // during the defined time range
+    // In a real editor, we'd determine visibility based on time range
     const isVisible = true; // This would depend on start/end time
 
     if (!isVisible) return null;
 
     return (
-        <Draggable
-            position={pos}
-            onStop={(e, data) => {
-                setPos({ x: data.x, y: data.y });
+        <div
+            className={`absolute ${isEditing ? 'cursor-move' : ''} pointer-events-${isEditing ? 'auto' : 'none'}`}
+            style={{
+                fontFamily: style.fontFamily,
+                fontSize: `${style.fontSize}px`,
+                color: style.color,
+                backgroundColor: style.backgroundColor || 'transparent',
+                fontWeight: style.bold ? 'bold' : 'normal',
+                fontStyle: style.italic ? 'italic' : 'normal',
+                textDecoration: style.underline ? 'underline' : 'none',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                zIndex: 10,
+                left: `${pos.x}%`,
+                top: `${pos.y}%`,
+                transform: 'translate(-50%, -50%)',
+                transition: isEditing ? 'none' : 'all 0.2s ease-out',
+                textShadow: style.backgroundColor === 'transparent' ? '0 1px 2px rgba(0,0,0,0.7)' : 'none',
             }}
         >
-            <div
-                className="absolute cursor-move select-none"
-                style={{
-                    fontFamily: style.fontFamily,
-                    fontSize: `${style.fontSize}px`,
-                    color: style.color,
-                    backgroundColor: style.backgroundColor || 'transparent',
-                    fontWeight: style.bold ? 'bold' : 'normal',
-                    fontStyle: style.italic ? 'italic' : 'normal',
-                    textDecoration: style.underline ? 'underline' : 'none',
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                    zIndex: 10,
-                }}
-            >
-                {text}
-            </div>
-        </Draggable>
+            {text}
+        </div>
     );
 }
